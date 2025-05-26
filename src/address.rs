@@ -1,4 +1,4 @@
-use core::net::SocketAddr;
+use core::net::{SocketAddr, SocketAddrV4, SocketAddrV6};
 use std::net::{IpAddr, Ipv4Addr};
 
 /// An address type, for use with the [`Socket`](`crate::Socket`) trait.
@@ -15,7 +15,9 @@ pub trait Address: Sized + Clone {
     ///
     /// For IP based addresses, checks if this is the IPv4 broadcast address.
     fn is_broadcast(&self) -> bool;
+    /// Returns the port number associated with this address.
     fn port(&self) -> u16;
+    /// Returns the IP address associated with this address.
     fn address(&self) -> IpAddr;
 }
 
@@ -36,6 +38,48 @@ impl Address for () {
     }
     fn address(&self) -> IpAddr {
         IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0))
+    }
+}
+
+impl Address for SocketAddrV4 {
+    fn same_host(&self, other: &Self) -> bool {
+        self.ip() == other.ip()
+    }
+
+    fn same(&self, other: &Self) -> bool {
+        *self == *other
+    }
+
+    fn is_broadcast(&self) -> bool {
+        self.ip().is_broadcast()
+    }
+
+    fn port(&self) -> u16 {
+        0
+    }
+    fn address(&self) -> IpAddr {
+        IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0))
+    }
+}
+
+impl Address for SocketAddrV6 {
+    fn same_host(&self, other: &Self) -> bool {
+        self.ip() == other.ip()
+    }
+
+    fn same(&self, other: &Self) -> bool {
+        *self == *other
+    }
+
+    fn is_broadcast(&self) -> bool {
+        false
+    }
+
+    fn port(&self) -> u16 {
+        0
+    }
+    fn address(&self) -> IpAddr {
+        IpAddr::V6(self.ip().clone())
     }
 }
 
