@@ -37,7 +37,7 @@ pub(crate) type _ENetPeerFlag = u32;
 pub(crate) const ENET_PEER_FLAG_CONTINUE_SENDING: _ENetPeerFlag = 2;
 pub(crate) const ENET_PEER_FLAG_NEEDS_DISPATCH: _ENetPeerFlag = 1;
 #[repr(C)]
-pub(crate) struct ENetPeer<S: Socket> {
+pub struct ENetPeer<S: Socket> {
     pub(crate) dispatch_list: ENetListNode,
     pub(crate) host: *mut ENetHost<S>,
     pub(crate) outgoing_peer_id: u16,
