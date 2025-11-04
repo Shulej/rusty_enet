@@ -1,4 +1,5 @@
 use core::{fmt::Debug, time::Duration};
+use std::boxed::Box;
 
 use crate::{
     consts::{PROTOCOL_MAXIMUM_MTU, PROTOCOL_MAXIMUM_PEER_ID, PROTOCOL_MINIMUM_MTU},
@@ -64,6 +65,37 @@ impl<S: Socket> Peer<S> {
     /// The ping interval can be changed with [`Self::set_ping_interval`].
     pub fn ping(&mut self) {
         unsafe { enet_peer_ping(self.0) }
+    }
+
+    /// Gets the inner data from a peer
+    pub fn get_data<T>(&mut self) -> Option<&mut T> {
+        unsafe {
+            let raw_data = (*self.0).data as *mut T;
+
+            if raw_data.is_null() {
+                None
+            } else {
+                Some(&mut (*raw_data))
+            }
+        }
+    }
+
+    /// Sets the inner data for a peer
+    pub fn set_data<T>(&mut self, data: Option<T>) {
+        unsafe {
+            let raw_data = (*self.0).data as *mut T;
+
+            if !raw_data.is_null() {
+                let _: Box<T> = Box::from_raw(raw_data);
+            }
+
+            let new_data = match data {
+                Some(data) => Box::into_raw(Box::new(data)) as *mut _,
+                None => std::ptr::null_mut()
+            };
+
+            (*self.0).data = new_data;
+        }
     }
 
     /// Queues a packet to be sent to this peer on the specified channel.
