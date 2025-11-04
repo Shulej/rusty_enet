@@ -154,6 +154,7 @@ mod time;
 mod version;
 
 pub use address::*;
+pub use c::ENetPeer;
 pub(crate) use c::*;
 pub use compressor::*;
 pub use crc32::*;
