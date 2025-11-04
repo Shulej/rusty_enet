@@ -98,6 +98,11 @@ impl<S: Socket> Peer<S> {
         }
     }
 
+    /// Returns the pointer of [`ENetPeer`]
+    pub fn get_inner_peer(&mut self) -> *mut ENetPeer<S> {
+        self.0
+    }
+
     /// Queues a packet to be sent to this peer on the specified channel.
     ///
     /// # Errors
