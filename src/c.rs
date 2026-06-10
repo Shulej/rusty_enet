@@ -11,7 +11,6 @@ mod packet;
 mod peer;
 mod protocol;
 
-pub use peer::ENetPeer;
 pub(crate) use compress::*;
 pub(crate) use event::*;
 pub(crate) use host::*;

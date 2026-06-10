@@ -68,14 +68,17 @@ impl<S: Socket> Peer<S> {
     }
 
     /// Gets the inner data from a peer
-    pub fn get_data<T>(&mut self) -> Option<&mut T> {
+    pub fn get_data<T>(&self) -> Option<T>
+    where
+        T: Copy,
+    {
         unsafe {
-            let raw_data = (*self.0).data as *mut T;
+            let ptr = (*self.0).data as *const T;
 
-            if raw_data.is_null() {
+            if ptr.is_null() {
                 None
             } else {
-                Some(&mut (*raw_data))
+                Some(ptr.read_unaligned())
             }
         }
     }
@@ -96,11 +99,6 @@ impl<S: Socket> Peer<S> {
 
             (*self.0).data = new_data;
         }
-    }
-
-    /// Returns the pointer of [`ENetPeer`]
-    pub fn get_inner_peer(&mut self) -> *mut ENetPeer<S> {
-        self.0
     }
 
     /// Queues a packet to be sent to this peer on the specified channel.
