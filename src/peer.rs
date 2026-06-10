@@ -84,20 +84,21 @@ impl<S: Socket> Peer<S> {
     }
 
     /// Sets the inner data for a peer
-    pub fn set_data<T>(&mut self, data: Option<T>) {
+    pub fn set_data<T>(&mut self, data: Option<T>)
+    where
+        T: Copy,
+    {
         unsafe {
             let raw_data = (*self.0).data as *mut T;
 
             if !raw_data.is_null() {
-                let _: Box<T> = Box::from_raw(raw_data);
+                drop(Box::from_raw(raw_data));
             }
 
-            let new_data = match data {
-                Some(data) => Box::into_raw(Box::new(data)) as *mut _,
-                None => std::ptr::null_mut()
+            (*self.0).data = match data {
+                Some(v) => Box::into_raw(Box::new(v)) as *mut _,
+                None => std::ptr::null_mut(),
             };
-
-            (*self.0).data = new_data;
         }
     }
 
